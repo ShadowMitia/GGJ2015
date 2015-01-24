@@ -56,7 +56,7 @@ public:
 private:
 
 	std::vector<std::vector<int>> currentTurnRessources;
-	std::vector<std::vector<int>> currentTurnChiefRessources
+	std::vector<std::vector<int>> currentTurnChiefRessources;
 	std::vector<std::vector<int>> globalRessources;
 	std::vector<std::vector<int>> variancesRessources;
 };

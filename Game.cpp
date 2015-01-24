@@ -21,12 +21,16 @@ Game::Game(std::string name)
 	
 	std::srand(std::time(0));
 
-	for (int i = 0; i < 10; i++){
+	for (int i = 0; i < 50; i++){
 		pickableRessources.emplace_back(std::rand() % m_window.getSize().x, std::rand() % m_window.getSize().y, 32, 32, sf::Color::Blue, std::rand() % 4, std::to_string(i), m_font);
 	}
 
 	for (int i = 0; i < NUMBER_PLAYER; i++){
 		players.emplace_back(10, 10, 32, i);
+	}
+
+	for (int i = 0; i < 5; i++) {
+		powerups.emplace_back(100 + i * 100, 100 + i * 100, PowerupShape::SQUARE, Effect::SPEED, sf::Color::Green);
 	}
 
 
@@ -92,6 +96,7 @@ void Game::update(sf::Time elapsedTime) {
 			if (Collisions::collisionPlayer(p, pu)){
 				if (pu.getEffect() == Effect::SPEED){
 					p.applySpeedEffect();
+					pu.destroy();
 				}
 			}
 		}
@@ -100,6 +105,10 @@ void Game::update(sf::Time elapsedTime) {
     pickableRessources.erase(std::remove_if(std::begin(pickableRessources), std::end(pickableRessources), 
     [](Entity& entity){ return entity.destroyed(); }), 
     std::end(pickableRessources));
+
+    powerups.erase(std::remove_if(std::begin(powerups), std::end(powerups),
+    	[](Powerup& pu){ return pu.destroyed(); }),
+    std::end(powerups));
 }
 
 void Game::render() {
