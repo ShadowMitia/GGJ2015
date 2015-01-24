@@ -9,10 +9,11 @@ static constexpr int NUMBER_PLAYER = 4;
 
 class RessourceManager {
 public:
-	RessourceManager() : currentTurnRessources(NUMBER_PLAYER), globalRessources(NUMBER_PLAYER), variancesRessources(MAX_RESSOURCES){
+	RessourceManager() : currentTurnRessources(NUMBER_PLAYER), currentTurnChiefRessources(NUMBER_PLAYER), globalRessources(NUMBER_PLAYER), variancesRessources(MAX_RESSOURCES){
 		for (unsigned int i = 0; i < NUMBER_PLAYER; i++){
 			for (unsigned int j = 0; j < MAX_RESSOURCES; j++){
 				currentTurnRessources[i].push_back(0);
+				currentTurnChiefRessources[i].push_back(0);
 				globalRessources[i].push_back(0);
 			}
 		}
@@ -35,23 +36,27 @@ public:
 	}
 
 	void printDebug(){
-		//printMatrix(currentTurnRessources);
-		//std::cout << std::endl << std::endl;
+		printMatrix(currentTurnRessources);
+		std::cout << std::endl << std::endl;
+
+		printMatrix(currentTurnChiefRessources);
+		std::cout << std::endl << std::endl;
 
 		printMatrix(globalRessources);
 		std::cout << std::endl << std::endl;
 
-		//printMatrix(variancesRessources);
-		//std::cout << std::endl;
+		printMatrix(variancesRessources);
+		std::cout << std::endl;
 	}
 
 	void playerGrabRessource(Player& player, int type){
-		globalRessources[player.getNumber()][type]++;
+		currentTurnRessources[player.getNumber()][type]++;
 	}
 
 private:
 
 	std::vector<std::vector<int>> currentTurnRessources;
+	std::vector<std::vector<int>> currentTurnChiefRessources
 	std::vector<std::vector<int>> globalRessources;
 	std::vector<std::vector<int>> variancesRessources;
 };
