@@ -15,7 +15,7 @@
 #include "Ressource.hpp"
 #include "Collision.hpp"
 #include "Powerup.hpp"
-#include "RessourceStorage.hpp"
+#include "RessourceManager.hpp"
 
 
 const sf::Time TIME_PER_FRAME = sf::seconds(1.f/60.f);
