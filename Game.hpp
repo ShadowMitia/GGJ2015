@@ -36,6 +36,10 @@ class Game : private sf::NonCopyable {
 
 	private:
 
+		enum class State {MAIN_MENU, FIRST_TURN, VOTE, RESULTS, ENDING, GAME_OVER};
+
+		State currentState;
+
 		// General game things
 		sf::RenderWindow m_window;
  
@@ -54,6 +58,8 @@ class Game : private sf::NonCopyable {
 		std::vector<Powerup> powerups;
 
 		RessourceManager ressourceManager;
+
+		int currentChief{-1};
 
 
 		// Network stuff

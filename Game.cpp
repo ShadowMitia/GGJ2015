@@ -10,6 +10,7 @@ Game::Game(std::string name)
 , players()
 , powerups()
 , ressourceManager()
+, currentState(State::FIRST_TURN)
 {
 	m_font.loadFromFile("media/Prototype.ttf");
 	m_numberFont.loadFromFile("media/Prototype.ttf");
@@ -75,16 +76,25 @@ void Game::processEvents() {
 		}
 	}
 	for (Player& p : players){
+		if ( !(currentState == State::FIRST_TURN) && p.getNumber() == currentChief){
+			break;
+		}
 		p.handleInputs();
 	}
 }
 
 void Game::update(sf::Time elapsedTime) {
 	for (Player& p : players){
+		if (! (currentState == State::FIRST_TURN) && p.getNumber() == currentChief){
+			break;
+		}
 		p.update(elapsedTime);	
 	}
 
 	for (Player& p : players){
+		if (! (currentState == State::FIRST_TURN) && p.getNumber() == currentChief){
+			break;
+		}
 		for (auto& e : pickableRessources){
 			if (Collisions::collisionPlayer(p, e)){
 				ressourceManager.playerGrabRessource(p, e.getType());
@@ -102,13 +112,19 @@ void Game::update(sf::Time elapsedTime) {
 		}
 	}
 
+	// next bit should be refactorized
+
+	// remove all picked up ressources
     pickableRessources.erase(std::remove_if(std::begin(pickableRessources), std::end(pickableRessources), 
     [](Entity& entity){ return entity.destroyed(); }), 
     std::end(pickableRessources));
 
+    // remove all picked up powerups
     powerups.erase(std::remove_if(std::begin(powerups), std::end(powerups),
     	[](Powerup& pu){ return pu.destroyed(); }),
     std::end(powerups));
+
+    // end next bit
 }
 
 void Game::render() {
@@ -116,7 +132,12 @@ void Game::render() {
 	ressourceManager.printDebug();
 	for (Ressource& e : pickableRessources) { e.draw(m_window); }
 	for (Powerup& pu : powerups) { pu.draw(m_window); }
-	for (Player& p : players) { p.draw(m_window); }
+	for (Player& p : players) {
+		if (! (currentState == State::FIRST_TURN) && p.getNumber() == currentChief){
+			break;
+		} 
+		p.draw(m_window); 
+	}
 	//m_window.draw(m_statistics_text);
 	m_window.display();
 }

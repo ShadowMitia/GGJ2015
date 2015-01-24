@@ -19,6 +19,7 @@ class Player : public Entity {
 			velocity.y = speed;
 			number = playerNumber;
 			std::cout << playerNumber << number;
+			playerName = std::to_string(number);
 		}
 
 		void update(sf::Time deltaTime) {
@@ -33,8 +34,8 @@ class Player : public Entity {
 					velocity.y = speed;
 				}
 			}
-
 		}
+		
 		void draw(sf::RenderTarget& target){
 			target.draw(shape);
 		}
@@ -92,6 +93,11 @@ class Player : public Entity {
 		bool isMoving{false};
 		bool buttonReleased{true};
 		int number;
+
+		sf::Text playerName;
+
+
+
 };
 
 #endif // HEADER_PLAYER

@@ -53,12 +53,65 @@ public:
 		currentTurnRessources[player.getNumber()][type]++;
 	}
 
+	void addCurrentTurnToGlobal(){
+		for (int i = 0; i < currentTurnRessources.size(); i++){
+			for (int j = 0; j < currentTurnRessources[i].size(); j++){
+				globalRessources[i][j] += currentTurnRessources[i][j];
+			}
+		}
+	}
+
+	float getChiefEfficiency() { return chiefEfficiency; }
+
+	void calculateChiefEfficiency(int currentTurn) {
+		float max = 0;
+		float sumCurrentTurnRessourcesVariances = 0;
+		for (int i = 0; i < currentTurnRessources.size(); i++){
+			for (int j = 0; j < currentTurnRessources[i].size(); j++) {
+				sumCurrentTurnRessourcesVariances += currentTurnRessources[i][j] * variancesRessources[i][currentTurn];
+			}
+		}
+
+		float sumChiefsTurnRessourcesVariances = 0;
+		for (int i = 0; i < currentTurnChiefRessources.size(); i++){
+			for (int j = 0; j < currentTurnChiefRessources[i].size(); j++) {
+				sumChiefsTurnRessourcesVariances += currentTurnChiefRessources[i][j] * variancesRessources[i][currentTurn];
+			}
+		}
+
+		float temp = (1 - std::abs( sumCurrentTurnRessourcesVariances - sumChiefsTurnRessourcesVariances) / sumCurrentTurnRessourcesVariances);
+		chiefEfficiency = temp > 0 ? temp : 0;
+	}
+
+	void calculateRessourceValueVariations(int currentTurn){
+		int total = 0;
+		for (int i = 0; i < currentTurnRessources.size(); i++){
+			for (int j = 0; j < currentTurnRessources[i].size(); j++){
+				total += currentTurnRessources[i][j];
+			}
+		}
+
+		float sumGatheredRessources = 0;
+
+		for (int i = 0; i < currentTurnRessources.size(); i++){
+			for (int j = 0; j < currentTurnRessources[i].size(); j++){
+				sumGatheredRessources += currentTurnRessources[i][j];
+			}
+		}
+
+		for (int i = 0; i < MAX_RESSOURCES; i++){
+			variancesRessources[i][currentTurn] += 1.5 - 
+		}
+	}
+
 private:
 
 	std::vector<std::vector<int>> currentTurnRessources;
 	std::vector<std::vector<int>> currentTurnChiefRessources;
 	std::vector<std::vector<int>> globalRessources;
 	std::vector<std::vector<int>> variancesRessources;
+
+	float chiefEfficiency{1};
 };
 
 #endif
