@@ -4,8 +4,19 @@
 #include <SFML/Graphics.hpp>
 #include <SFML/Network.hpp>
 
-#include <sstream>
 #include <iostream>
+#include <vector>
+
+// For random things
+#include <ctime>
+#include <cstdlib>
+
+#include "Player.hpp"
+#include "Ressource.hpp"
+#include "Collision.hpp"
+#include "Powerup.hpp"
+#include "RessourceStorage.hpp"
+
 
 const sf::Time TIME_PER_FRAME = sf::seconds(1.f/60.f);
 
@@ -24,20 +35,31 @@ class Game : private sf::NonCopyable {
 
 	private:
 
+		// General game things
 		sf::RenderWindow m_window;
  
 		sf::Font m_font;
 		sf::Font m_numberFont;
 
+		// FPS COUNTER!!!!!
 		sf::Text m_statistics_text;
 		sf::Time m_statistics_update_time;
 		std::size_t m_statistics_num_frames;
 
 
+		// Specific game things
+		std::vector<Ressource> pickableRessources;
+		Player player;
+		Powerup p; // A transformer en std::vector
+
+		RessourceManager myStorage;
+
+
 		// Network stuff
-		//
 		sf::UdpSocket socket;
 		sf::Packet packet;
+
+
 
 };
 

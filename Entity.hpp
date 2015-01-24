@@ -7,9 +7,9 @@ class Entity {
 public:
 	virtual ~Entity() {};
 	virtual void draw(sf::RenderTarget& target) = 0;
-	virtual void update(sf::Time deltaTime) {};
+	virtual void update(sf::Time deltaTime) {}
 
-	const bool destroyed() { return isDestroyed; }
+	bool destroyed() { return isDestroyed; }
 	void destroy() { isDestroyed = true; }
 
 private:

@@ -1,7 +1,10 @@
 TARGET = ggj2015
 
 all:
-	g++ -pedantic -std=c++11 -g -Wall -c *.cpp && g++ -pedantic -g -std=c++11 *.o -o $(TARGET) -lsfml-graphics -lsfml-window -lsfml-network -lsfml-system
+	mkdir -p build
+	cd build
+	clang++ -std=c++11 -g -Wall -Wextra -c *.cpp && clang++ -g -std=c++11 *.o -o $(TARGET) -lsfml-graphics -lsfml-window -lsfml-network -lsfml-system
+	cd ..
 
 run:
-	./$(TARGET)
+	./build/$(TARGET)

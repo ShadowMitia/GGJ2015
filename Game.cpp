@@ -2,12 +2,14 @@
 
 
 Game::Game(std::string name)
-: m_window(sf::VideoMode(640, 480), name, sf::Style::Close)
+: m_window(sf::VideoMode(800, 600), name, sf::Style::Close)
 , m_font()
 , m_statistics_text()
 , m_statistics_update_time()
 , m_statistics_num_frames(0)
-
+, player(m_window.getSize().x / 2, m_window.getSize().y / 2, 32 / 2)
+, p(100, 100, PowerupShape::SQUARE, Effect::SPEED, sf::Color::Green)
+, myStorage()
 {
 
 	m_font.loadFromFile("media/Prototype.ttf");
@@ -15,6 +17,14 @@ Game::Game(std::string name)
 	m_statistics_text.setFont(m_font);
 	m_statistics_text.setPosition(5.f, 5.f);
 	m_statistics_text.setCharacterSize(18);
+
+	// my stuff
+	
+	std::srand(std::time(0));
+
+	for (int i = 0; i < 10; i++){
+		pickableRessources.emplace_back(std::rand() % m_window.getSize().x, std::rand() % m_window.getSize().y, 32, 32, sf::Color::Blue, std::to_string(i), m_font);
+	}
 
 
 	// network stuff
@@ -57,15 +67,36 @@ void Game::processEvents() {
 				break;
 		}
 	}
+	player.handleInputs();
 }
 
 void Game::update(sf::Time elapsedTime) {
+	player.update(elapsedTime);
 
+	for (auto& e : pickableRessources){
+		if (Collisions::collisionPlayer(player, e)){
+			//std::cout << "Collision! " << e.getText() << " X: " << e.getPosition().x << " Y: " << e.getPosition().y << std::endl; 
+			e.destroy();
+		}
+	}
+
+	if (Collisions::collisionPlayer(player, p)){
+		if (p.getEffect() == Effect::SPEED){
+			player.applySpeedEffect();
+		}
+	}
+
+    pickableRessources.erase(std::remove_if(std::begin(pickableRessources), std::end(pickableRessources), 
+    [](Entity& entity){ return entity.destroyed(); }), 
+    std::end(pickableRessources));
 }
 
 void Game::render() {
 	m_window.clear();
 
+	for (auto e : pickableRessources) { e.draw(m_window); }
+	p.draw(m_window);
+	player.draw(m_window);
 	m_window.draw(m_statistics_text);
 	m_window.display();
 }
