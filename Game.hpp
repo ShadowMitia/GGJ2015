@@ -6,16 +6,17 @@
 
 #include <iostream>
 #include <vector>
-
-// For random things
-#include <ctime>
-#include <cstdlib>
+#include <sstream>
 
 #include "Player.hpp"
 #include "Ressource.hpp"
 #include "Collision.hpp"
 #include "Powerup.hpp"
 #include "RessourceManager.hpp"
+
+// For random things
+#include <ctime>
+#include <cstdlib>
 
 
 const sf::Time TIME_PER_FRAME = sf::seconds(1.f/60.f);
@@ -49,10 +50,10 @@ class Game : private sf::NonCopyable {
 
 		// Specific game things
 		std::vector<Ressource> pickableRessources;
-		Player player;
-		Powerup p; // A transformer en std::vector
+		std::vector<Player> players;
+		std::vector<Powerup> powerups;
 
-		RessourceManager myStorage;
+		RessourceManager ressourceManager;
 
 
 		// Network stuff

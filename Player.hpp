@@ -13,10 +13,12 @@ class Player : public Entity {
 		constexpr static float deadZoneRadius = 50;
 
 
-		Player(float x, float y, float radius) : shape(radius) {
+		Player(float x, float y, float radius, int playerNumber) : shape(radius) {
 			shape.setPosition(x, y);
 			velocity.x = speed;
 			velocity.y = speed;
+			number = playerNumber;
+			std::cout << playerNumber << number;
 		}
 
 		void update(sf::Time deltaTime) {
@@ -42,15 +44,15 @@ class Player : public Entity {
 
 		void handleInputs() {
 			
-			speedAxis.x = sf::Joystick::getAxisPosition(0, sf::Joystick::X);
-			speedAxis.y = sf::Joystick::getAxisPosition(0, sf::Joystick::Y);
+			speedAxis.x = sf::Joystick::getAxisPosition(number, sf::Joystick::X);
+			speedAxis.y = sf::Joystick::getAxisPosition(number, sf::Joystick::Y);
 
-			if (sf::Joystick::isButtonPressed(0, 0) && buttonReleased){
+			if (sf::Joystick::isButtonPressed(number, 0) && buttonReleased){
 				isMoving = true;
 				buttonReleased = false;
 			}
 
-			if (!sf::Joystick::isButtonPressed(0, 0)){
+			if (!sf::Joystick::isButtonPressed(number, 0)){
 				isMoving = false;
 				buttonReleased = true;
 			}
@@ -76,6 +78,8 @@ class Player : public Entity {
 			velocity.y *= 2;
 		}
 
+		int getNumber() { return number; }
+
 	private:
 		sf::CircleShape shape;
 		sf::Vector2f speedAxis;
@@ -87,6 +91,7 @@ class Player : public Entity {
 		bool timerActive{false};
 		bool isMoving{false};
 		bool buttonReleased{true};
+		int number;
 };
 
 #endif // HEADER_PLAYER

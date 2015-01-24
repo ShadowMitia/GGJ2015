@@ -7,11 +7,10 @@ Game::Game(std::string name)
 , m_statistics_text()
 , m_statistics_update_time()
 , m_statistics_num_frames(0)
-, player(m_window.getSize().x / 2, m_window.getSize().y / 2, 32 / 2)
-, p(100, 100, PowerupShape::SQUARE, Effect::SPEED, sf::Color::Green)
-, myStorage()
+, players()
+, powerups()
+, ressourceManager()
 {
-
 	m_font.loadFromFile("media/Prototype.ttf");
 	m_numberFont.loadFromFile("media/Prototype.ttf");
 	m_statistics_text.setFont(m_font);
@@ -23,7 +22,11 @@ Game::Game(std::string name)
 	std::srand(std::time(0));
 
 	for (int i = 0; i < 10; i++){
-		pickableRessources.emplace_back(std::rand() % m_window.getSize().x, std::rand() % m_window.getSize().y, 32, 32, sf::Color::Blue, std::to_string(i), m_font);
+		pickableRessources.emplace_back(std::rand() % m_window.getSize().x, std::rand() % m_window.getSize().y, 32, 32, sf::Color::Blue, std::rand() % 4, std::to_string(i), m_font);
+	}
+
+	for (int i = 0; i < NUMBER_PLAYER; i++){
+		players.emplace_back(10, 10, 32, i);
 	}
 
 
@@ -67,22 +70,30 @@ void Game::processEvents() {
 				break;
 		}
 	}
-	player.handleInputs();
+	for (Player& p : players){
+		p.handleInputs();
+	}
 }
 
 void Game::update(sf::Time elapsedTime) {
-	player.update(elapsedTime);
-
-	for (auto& e : pickableRessources){
-		if (Collisions::collisionPlayer(player, e)){
-			//std::cout << "Collision! " << e.getText() << " X: " << e.getPosition().x << " Y: " << e.getPosition().y << std::endl; 
-			e.destroy();
-		}
+	for (Player& p : players){
+		p.update(elapsedTime);	
 	}
 
-	if (Collisions::collisionPlayer(player, p)){
-		if (p.getEffect() == Effect::SPEED){
-			player.applySpeedEffect();
+	for (Player& p : players){
+		for (auto& e : pickableRessources){
+			if (Collisions::collisionPlayer(p, e)){
+				ressourceManager.playerGrabRessource(p, e.getType());
+				e.destroy();
+			}
+		}
+
+		for(Powerup& pu : powerups){
+			if (Collisions::collisionPlayer(p, pu)){
+				if (pu.getEffect() == Effect::SPEED){
+					p.applySpeedEffect();
+				}
+			}
 		}
 	}
 
@@ -93,11 +104,11 @@ void Game::update(sf::Time elapsedTime) {
 
 void Game::render() {
 	m_window.clear();
-
-	for (auto e : pickableRessources) { e.draw(m_window); }
-	p.draw(m_window);
-	player.draw(m_window);
-	m_window.draw(m_statistics_text);
+	ressourceManager.printDebug();
+	for (Ressource& e : pickableRessources) { e.draw(m_window); }
+	for (Powerup& pu : powerups) { pu.draw(m_window); }
+	for (Player& p : players) { p.draw(m_window); }
+	//m_window.draw(m_statistics_text);
 	m_window.display();
 }
 
