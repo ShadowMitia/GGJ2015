@@ -2,6 +2,7 @@
 #define HEADER_GAME
 
 #include <SFML/Graphics.hpp>
+#include <SFML/Network.hpp>
 
 #include <sstream>
 #include <iostream>
@@ -31,6 +32,12 @@ class Game : private sf::NonCopyable {
 		sf::Text m_statistics_text;
 		sf::Time m_statistics_update_time;
 		std::size_t m_statistics_num_frames;
+
+
+		// Network stuff
+		//
+		sf::UdpSocket socket;
+		sf::Packet packet;
 
 };
 

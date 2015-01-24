@@ -15,6 +15,16 @@ Game::Game(std::string name)
 	m_statistics_text.setFont(m_font);
 	m_statistics_text.setPosition(5.f, 5.f);
 	m_statistics_text.setCharacterSize(18);
+
+
+	// network stuff
+	
+	if (socket.bind(5400) != sf::Socket::Done){
+		std::cerr << "We have a socket error" << std::endl;
+	}
+
+	packet << "Hello, World!";
+	socket.send(packet, "localhost", 54001);
 }
 
 void Game::run() {
