@@ -29,7 +29,7 @@ Game::Game(std::string name)
 	}
 
 	for (int i = 0; i < 5; i++) {
-		powerups.emplace_back(100 + i * 100, 100 + i * 100, PowerupShape::TRIANGLE, Effect::SPEED, sf::Color::Green);
+		powerups.emplace_back(100 + i * 100, 100 + i * 100, PowerupShape::TRIANGLE, Effect::SLOW_DOWN, sf::Color::Green);
 	}
 
 
@@ -104,6 +104,13 @@ void Game::update(sf::Time elapsedTime) {
 			if (Collisions::collisionPlayer(p, pu)){
 				if (pu.getEffect() == Effect::SPEED){
 					p.applySpeedEffect();
+					pu.destroy();
+				} else if (pu.getEffect() == Effect::SLOW_DOWN){
+					for (Player& player : players){
+						if (player.getNumber() != p.getNumber()){
+							player.applySlowDownEffect();
+						}
+					}
 					pu.destroy();
 				}
 			}

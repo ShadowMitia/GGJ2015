@@ -28,7 +28,7 @@ class Player : public Entity {
 			}
 
 			if (timerActive){
-				if ( std::abs(timerStart.asSeconds() - effectTimer.getElapsedTime().asSeconds()) > 2){
+				if ( std::abs(timerStart.asSeconds() - effectTimer.getElapsedTime().asSeconds()) > effectTimeLength){
 					timerActive = false;
 					velocity.x = speed;
 					velocity.y = speed;
@@ -79,6 +79,13 @@ class Player : public Entity {
 			velocity.y *= 2;
 		}
 
+		void applySlowDownEffect() {
+			timerStart = effectTimer.getElapsedTime();
+			timerActive = true;
+			velocity.x /= 2;
+			velocity.y /= 2;
+		}
+
 		int getNumber() { return number; }
 
 	private:
@@ -88,6 +95,7 @@ class Player : public Entity {
 
 		sf::Clock effectTimer;
 		sf::Time timerStart;
+		sf::Time effectTimeLength;
 
 		bool timerActive{false};
 		bool isMoving{false};

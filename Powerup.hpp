@@ -7,8 +7,8 @@
 
 #include "Entity.hpp"
 
-enum class PowerupShape {SQUARE, TRIANGLE};
-enum class Effect {SPEED};
+enum class PowerupShape {SQUARE, TRIANGLE, HEXAGON, OCTOGON};
+enum class Effect {SPEED, SLOW_DOWN};
 
 class Powerup : public Entity {
 public:
@@ -20,7 +20,11 @@ public:
 			shape = new sf::RectangleShape(sf::Vector2f(32, 32));
 		} else if (pShape == PowerupShape::TRIANGLE){
 			shape = new sf::CircleShape(32, 3);
-		} else {
+		} else if (pShape == PowerupShape::HEXAGON){
+			shape = new sf::CircleShape(32, 6);
+		} else if (pShape == PowerupShape::OCTOGON) {
+			shape = new sf::CircleShape(32, 8);
+		}else {
 			std::cout << "MEGA PROBLEM" << std::endl;
 		}
 		powerup = effect;
