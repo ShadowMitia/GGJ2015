@@ -9,6 +9,7 @@ Game::Game(std::string name)
 , players()
 , powerups()
 , ressourceManager()
+, network(sf::IpAddress::LocalHost, 53000)
 {
 	m_font.loadFromFile("media/Prototype.ttf");
 	m_numberFont.loadFromFile("media/Prototype.ttf");
@@ -29,18 +30,8 @@ Game::Game(std::string name)
 	}
 
 	for (int i = 0; i < 5; i++) {
-		powerups.emplace_back(100 + i * 100, 100 + i * 100, PowerupShape::TRIANGLE, Effect::SLOW_DOWN, sf::Color::Green);
+		powerups.emplace_back(100 + i * 100, 100 + i * 100, PowerupShape::TRIANGLE, Effect::SPEED, sf::Color::Green);
 	}
-
-
-	// network stuff
-	
-	if (socket.bind(5400) != sf::Socket::Done){
-		std::cerr << "We have a socket error" << std::endl;
-	}
-
-	packet << "Hello, World!";
-	socket.send(packet, "localhost", 54001);
 }
 
 void Game::run() {
@@ -134,7 +125,7 @@ void Game::update(sf::Time elapsedTime) {
 
 void Game::render() {
 	m_window.clear();
-	ressourceManager.printDebug();
+	//ressourceManager.printDebug();
 	for (Ressource& e : pickableRessources) { e.draw(m_window); }
 	for (Powerup& pu : powerups) { pu.draw(m_window); }
 	for (Player& p : players) {

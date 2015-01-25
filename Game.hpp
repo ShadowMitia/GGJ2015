@@ -14,6 +14,7 @@
 #include "Powerup.hpp"
 #include "RessourceManager.hpp"
 #include "Stats.hpp"
+#include "Network.hpp"
 
 // For random things
 #include <ctime>
@@ -65,8 +66,8 @@ class Game : private sf::NonCopyable {
 
 
 		// Network stuff
-		sf::UdpSocket socket;
-		sf::Packet packet;
+
+		Network network;
 
 
 
