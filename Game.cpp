@@ -61,7 +61,6 @@ void Game::run() {
 void Game::processEvents() {
 	sf::Event event;
 
-
 	if (server){
 		// SERVER SPECIFIC EVENTS
 		while (m_window.pollEvent(event)) {
@@ -79,6 +78,8 @@ void Game::processEvents() {
 				default:
 					break;
 			}
+
+		// SERVER SPECIFIC EVENTS
 		}
 	} else {
 		// CLIENT SPECIFIC EVENTS
@@ -106,13 +107,19 @@ void Game::processEvents() {
 			}
 			p.handleInputs();
 		}
+
+		// END CLIENT SPECIFIC EVENTS
 	}
 }
 
 void Game::update(sf::Time elapsedTime) {
 	if (server){
+		// SERVER UPDATE
+		
+		// END SERVER UPDATE
 
 	} else {
+		// CLIENT UPDATE
 		for (Player& p : players){
 			if ( p.getNumber() == currentChief){
 				break;
@@ -161,14 +168,20 @@ void Game::update(sf::Time elapsedTime) {
 	    std::end(powerups));
 
 	    // end next bit
+	    
+
+	    // END CLIENT UPDATE
 	}
-
-
 }
 
 void Game::render() {
 	if (server){
+		// SERVER RENDERING
+		
+		// END SERVER RENDERING
 	} else {
+		// CLIENT RENDERING
+		
 		m_window.clear();
 		//ressourceManager.printDebug();
 		for (Ressource& e : pickableRessources) { e.draw(m_window); }
@@ -183,6 +196,8 @@ void Game::render() {
 		Stats::drawCurrentTurnValuesRessources(m_window, ressourceManager, currentChief, currentTurn);
 		//m_window.draw(m_statistics_text);
 		m_window.display();
+
+		// END CLIENT RENDERING
 	}
 }
 
