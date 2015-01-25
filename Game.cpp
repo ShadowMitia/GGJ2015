@@ -1,8 +1,7 @@
 #include "Game.hpp"
 
-
 Game::Game(std::string name)
-: m_window(sf::VideoMode(800, 600), name, sf::Style::Close)
+: m_window(sf::VideoMode(1200, 800), name, sf::Style::Close)
 , m_font()
 , m_statistics_text()
 , m_statistics_update_time()
@@ -10,7 +9,6 @@ Game::Game(std::string name)
 , players()
 , powerups()
 , ressourceManager()
-, currentState(State::FIRST_TURN)
 {
 	m_font.loadFromFile("media/Prototype.ttf");
 	m_numberFont.loadFromFile("media/Prototype.ttf");
@@ -31,7 +29,7 @@ Game::Game(std::string name)
 	}
 
 	for (int i = 0; i < 5; i++) {
-		powerups.emplace_back(100 + i * 100, 100 + i * 100, PowerupShape::SQUARE, Effect::SPEED, sf::Color::Green);
+		powerups.emplace_back(100 + i * 100, 100 + i * 100, PowerupShape::TRIANGLE, Effect::SPEED, sf::Color::Green);
 	}
 
 
@@ -76,7 +74,7 @@ void Game::processEvents() {
 		}
 	}
 	for (Player& p : players){
-		if ( !(currentState == State::FIRST_TURN) && p.getNumber() == currentChief){
+		if ( p.getNumber() == currentChief){
 			break;
 		}
 		p.handleInputs();
@@ -85,14 +83,14 @@ void Game::processEvents() {
 
 void Game::update(sf::Time elapsedTime) {
 	for (Player& p : players){
-		if (! (currentState == State::FIRST_TURN) && p.getNumber() == currentChief){
+		if ( p.getNumber() == currentChief){
 			break;
 		}
 		p.update(elapsedTime);	
 	}
 
 	for (Player& p : players){
-		if (! (currentState == State::FIRST_TURN) && p.getNumber() == currentChief){
+		if ( p.getNumber() == currentChief){
 			break;
 		}
 		for (auto& e : pickableRessources){
@@ -133,12 +131,13 @@ void Game::render() {
 	for (Ressource& e : pickableRessources) { e.draw(m_window); }
 	for (Powerup& pu : powerups) { pu.draw(m_window); }
 	for (Player& p : players) {
-		if (! (currentState == State::FIRST_TURN) && p.getNumber() == currentChief){
+		if ( p.getNumber() == currentChief){
 			break;
-		} 
+		}
 		p.draw(m_window); 
 	}
-	stats.drawCurrentTurnRessources(m_window, ressourceManager);
+	//Stats::drawCurrentTurnRessources(m_window, ressourceManager, currentChief);
+	Stats::drawCurrentTurnValuesRessources(m_window, ressourceManager, currentChief, currentTurn);
 	//m_window.draw(m_statistics_text);
 	m_window.display();
 }

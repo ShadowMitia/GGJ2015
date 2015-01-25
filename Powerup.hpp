@@ -17,10 +17,9 @@ public:
 	Powerup(int x, int y, PowerupShape pShape, Effect effect, sf::Color color){
 		text = sf::Text();
 		if (pShape == PowerupShape::SQUARE){
-			sf::RectangleShape* s = new sf::RectangleShape(sf::Vector2f(32, 32));
-			shape = s;
+			shape = new sf::RectangleShape(sf::Vector2f(32, 32));
 		} else if (pShape == PowerupShape::TRIANGLE){
-			std::cout << "Not implemented yet!" << std::endl;
+			shape = new sf::CircleShape(32, 3);
 		} else {
 			std::cout << "MEGA PROBLEM" << std::endl;
 		}

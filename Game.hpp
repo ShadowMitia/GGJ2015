@@ -37,7 +37,7 @@ class Game : private sf::NonCopyable {
 
 	private:
 
-		enum class State {MAIN_MENU, FIRST_TURN, VOTE, RESULTS, ENDING, GAME_OVER};
+		enum class State {MAIN_MENU, VOTE, RESULTS, ENDING, GAME_OVER};
 
 		State currentState;
 
@@ -60,9 +60,8 @@ class Game : private sf::NonCopyable {
 
 		RessourceManager ressourceManager;
 
-		Stats stats;
-
 		int currentChief{-1};
+		int currentTurn{0};
 
 
 		// Network stuff
