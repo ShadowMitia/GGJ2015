@@ -53,10 +53,6 @@ public:
 		currentTurnRessources[player.getNumber()][type]++;
 	}
 
-	void chiefGrabRessource(Player& chief, int type, int quantity){
-		// TODO
-	}
-
 	void addCurrentTurnToGlobal(){
 		for (unsigned int i = 0; i < currentTurnRessources.size(); i++){
 			for (unsigned int j = 0; j < currentTurnRessources[i].size(); j++){
@@ -109,7 +105,7 @@ public:
 				sum += variancesRessources[i][j];
 			}
 			variancesRessources[i][currentTurn] = 1.5 - (sumGatheredRessources/total + sum / sumGatheredRessources );
-		}
+		}		
 	}
 
 private:

@@ -1,6 +1,6 @@
 #include "Game.hpp"
 
-Game::Game(std::string name)
+Game::Game(std::string name, bool isServer)
 : m_window(sf::VideoMode(1200, 800), name, sf::Style::Close)
 , m_font()
 , m_statistics_text()
@@ -9,8 +9,14 @@ Game::Game(std::string name)
 , players()
 , powerups()
 , ressourceManager()
-, network(sf::IpAddress::LocalHost, 53000)
+, server(server)
 {
+	if (server){
+		network = new Network(53000);
+	} else {
+		network = new Network(sf::IpAddress::LocalHost, 53000);
+	}
+
 	m_font.loadFromFile("media/Prototype.ttf");
 	m_numberFont.loadFromFile("media/Prototype.ttf");
 	m_statistics_text.setFont(m_font);
@@ -54,90 +60,130 @@ void Game::run() {
 
 void Game::processEvents() {
 	sf::Event event;
-	while (m_window.pollEvent(event)) {
-		switch (event.type) {
-			case sf::Event::Closed:
-				m_window.close();
-				break;
 
-			default:
+
+	if (server){
+		// SERVER SPECIFIC EVENTS
+		while (m_window.pollEvent(event)) {
+			switch (event.type) {
+				case sf::Event::Closed:
+					m_window.close();
+					break;
+
+				case sf::Event::KeyPressed:
+					if (event.key.code == sf::Keyboard::Escape){
+						m_window.close();
+					}
+					break;
+
+				default:
+					break;
+			}
+		}
+	} else {
+		// CLIENT SPECIFIC EVENTS
+
+		while (m_window.pollEvent(event)) {
+			switch (event.type) {
+				case sf::Event::Closed:
+					m_window.close();
+					break;
+
+				case sf::Event::KeyPressed:
+					if (event.key.code == sf::Keyboard::Escape){
+						m_window.close();
+					}
+					break;
+
+				default:
+					break;
+			}
+		}
+
+		for (Player& p : players){
+			if ( p.getNumber() == currentChief){
 				break;
+			}
+			p.handleInputs();
 		}
-	}
-	for (Player& p : players){
-		if ( p.getNumber() == currentChief){
-			break;
-		}
-		p.handleInputs();
 	}
 }
 
 void Game::update(sf::Time elapsedTime) {
-	for (Player& p : players){
-		if ( p.getNumber() == currentChief){
-			break;
-		}
-		p.update(elapsedTime);	
-	}
+	if (server){
 
-	for (Player& p : players){
-		if ( p.getNumber() == currentChief){
-			break;
-		}
-		for (auto& e : pickableRessources){
-			if (Collisions::collisionPlayer(p, e)){
-				ressourceManager.playerGrabRessource(p, e.getType());
-				e.destroy();
+	} else {
+		for (Player& p : players){
+			if ( p.getNumber() == currentChief){
+				break;
 			}
+			p.update(elapsedTime);	
 		}
 
-		for(Powerup& pu : powerups){
-			if (Collisions::collisionPlayer(p, pu)){
-				if (pu.getEffect() == Effect::SPEED){
-					p.applySpeedEffect();
-					pu.destroy();
-				} else if (pu.getEffect() == Effect::SLOW_DOWN){
-					for (Player& player : players){
-						if (player.getNumber() != p.getNumber()){
-							player.applySlowDownEffect();
+		for (Player& p : players){
+			if ( p.getNumber() == currentChief){
+				break;
+			}
+			for (auto& e : pickableRessources){
+				if (Collisions::collisionPlayer(p, e)){
+					ressourceManager.playerGrabRessource(p, e.getType());
+					e.destroy();
+				}
+			}
+
+			for(Powerup& pu : powerups){
+				if (Collisions::collisionPlayer(p, pu)){
+					if (pu.getEffect() == Effect::SPEED){
+						p.applySpeedEffect();
+						pu.destroy();
+					} else if (pu.getEffect() == Effect::SLOW_DOWN){
+						for (Player& player : players){
+							if (player.getNumber() != p.getNumber()){
+								player.applySlowDownEffect();
+							}
 						}
+						pu.destroy();
 					}
-					pu.destroy();
 				}
 			}
 		}
+
+		// next bit should be refactorized
+
+		// remove all picked up ressources
+	    pickableRessources.erase(std::remove_if(std::begin(pickableRessources), std::end(pickableRessources), 
+	    [](Entity& entity){ return entity.destroyed(); }), 
+	    std::end(pickableRessources));
+
+	    // remove all picked up powerups
+	    powerups.erase(std::remove_if(std::begin(powerups), std::end(powerups),
+	    	[](Powerup& pu){ return pu.destroyed(); }),
+	    std::end(powerups));
+
+	    // end next bit
 	}
 
-	// next bit should be refactorized
 
-	// remove all picked up ressources
-    pickableRessources.erase(std::remove_if(std::begin(pickableRessources), std::end(pickableRessources), 
-    [](Entity& entity){ return entity.destroyed(); }), 
-    std::end(pickableRessources));
-
-    // remove all picked up powerups
-    powerups.erase(std::remove_if(std::begin(powerups), std::end(powerups),
-    	[](Powerup& pu){ return pu.destroyed(); }),
-    std::end(powerups));
-
-    // end next bit
 }
 
 void Game::render() {
-	m_window.clear();
-	//ressourceManager.printDebug();
-	for (Ressource& e : pickableRessources) { e.draw(m_window); }
-	for (Powerup& pu : powerups) { pu.draw(m_window); }
-	for (Player& p : players) {
-		if ( p.getNumber() == currentChief){
-			break;
+	if (server){
+	} else {
+		m_window.clear();
+		//ressourceManager.printDebug();
+		for (Ressource& e : pickableRessources) { e.draw(m_window); }
+		for (Powerup& pu : powerups) { pu.draw(m_window); }
+		for (Player& p : players) {
+			if ( p.getNumber() == currentChief){
+				break;
+			}
+			p.draw(m_window); 
 		}
-		p.draw(m_window); 
+		//Stats::drawCurrentTurnRessources(m_window, ressourceManager, currentChief);
+		Stats::drawCurrentTurnValuesRessources(m_window, ressourceManager, currentChief, currentTurn);
+		//m_window.draw(m_statistics_text);
+		m_window.display();
 	}
-	//Stats::drawCurrentTurnRessources(m_window, ressourceManager, currentChief);
-	Stats::drawCurrentTurnValuesRessources(m_window, ressourceManager, currentChief, currentTurn);
-	//m_window.draw(m_statistics_text);
-	m_window.display();
 }
 
 void Game::updateStatistics(sf::Time elapsedTime) {

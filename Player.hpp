@@ -12,13 +12,11 @@ class Player : public Entity {
 		constexpr static float speed = 10;
 		constexpr static float deadZoneRadius = 50;
 
-
 		Player(float x, float y, float radius, int playerNumber) : shape(radius) {
 			shape.setPosition(x, y);
 			velocity.x = speed;
 			velocity.y = speed;
 			number = playerNumber;
-			std::cout << playerNumber << number;
 			playerName.setString(std::to_string(number));
 		}
 

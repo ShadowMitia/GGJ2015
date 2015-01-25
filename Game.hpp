@@ -25,7 +25,7 @@ const sf::Time TIME_PER_FRAME = sf::seconds(1.f/60.f);
 
 class Game : private sf::NonCopyable {
 	public:
-		Game(std::string name);
+		Game(std::string name, bool server);
 		void run();
 
 	private:
@@ -37,10 +37,6 @@ class Game : private sf::NonCopyable {
 		
 
 	private:
-
-		enum class State {MAIN_MENU, VOTE, RESULTS, ENDING, GAME_OVER};
-
-		State currentState;
 
 		// General game things
 		sf::RenderWindow m_window;
@@ -67,7 +63,8 @@ class Game : private sf::NonCopyable {
 
 		// Network stuff
 
-		Network network;
+		Network* network;
+		bool server;
 
 
 
