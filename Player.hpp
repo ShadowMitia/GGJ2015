@@ -19,7 +19,7 @@ class Player : public Entity {
 			velocity.y = speed;
 			number = playerNumber;
 			std::cout << playerNumber << number;
-			playerName = std::to_string(number);
+			playerName.setString(std::to_string(number));
 		}
 
 		void update(sf::Time deltaTime) {
@@ -35,7 +35,7 @@ class Player : public Entity {
 				}
 			}
 		}
-		
+
 		void draw(sf::RenderTarget& target){
 			target.draw(shape);
 		}

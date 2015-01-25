@@ -54,27 +54,25 @@ public:
 	}
 
 	void addCurrentTurnToGlobal(){
-		for (int i = 0; i < currentTurnRessources.size(); i++){
-			for (int j = 0; j < currentTurnRessources[i].size(); j++){
+		for (unsigned int i = 0; i < currentTurnRessources.size(); i++){
+			for (unsigned int j = 0; j < currentTurnRessources[i].size(); j++){
 				globalRessources[i][j] += currentTurnRessources[i][j];
 			}
 		}
 	}
 
 	float getChiefEfficiency() { return chiefEfficiency; }
+	std::vector<std::vector<int>> getCurrentTurnRessources() { return currentTurnRessources; }
+	std::vector<std::vector<int>> getCurrentTurnChiefRessources() { return currentTurnChiefRessources; }
+	std::vector<std::vector<int>> getGlobalRessources() { return globalRessources; }
+	std::vector<std::vector<int>> getVariancesRessources() { return variancesRessources; }
 
 	void calculateChiefEfficiency(int currentTurn) {
-		float max = 0;
 		float sumCurrentTurnRessourcesVariances = 0;
-		for (int i = 0; i < currentTurnRessources.size(); i++){
-			for (int j = 0; j < currentTurnRessources[i].size(); j++) {
-				sumCurrentTurnRessourcesVariances += currentTurnRessources[i][j] * variancesRessources[i][currentTurn];
-			}
-		}
-
 		float sumChiefsTurnRessourcesVariances = 0;
-		for (int i = 0; i < currentTurnChiefRessources.size(); i++){
-			for (int j = 0; j < currentTurnChiefRessources[i].size(); j++) {
+		for (unsigned int i = 0; i < currentTurnRessources.size(); i++){
+			for (unsigned int j = 0; j < currentTurnRessources[i].size(); j++) {
+				sumCurrentTurnRessourcesVariances += currentTurnRessources[i][j] * variancesRessources[i][currentTurn];
 				sumChiefsTurnRessourcesVariances += currentTurnChiefRessources[i][j] * variancesRessources[i][currentTurn];
 			}
 		}
@@ -85,22 +83,28 @@ public:
 
 	void calculateRessourceValueVariations(int currentTurn){
 		int total = 0;
-		for (int i = 0; i < currentTurnRessources.size(); i++){
-			for (int j = 0; j < currentTurnRessources[i].size(); j++){
+		for (unsigned int i = 0; i < currentTurnRessources.size(); i++){
+			for (unsigned int j = 0; j < currentTurnRessources[i].size(); j++){
 				total += currentTurnRessources[i][j];
 			}
 		}
 
 		float sumGatheredRessources = 0;
+		float sumChiefsRessources = 0;
 
-		for (int i = 0; i < currentTurnRessources.size(); i++){
-			for (int j = 0; j < currentTurnRessources[i].size(); j++){
-				sumGatheredRessources += currentTurnRessources[i][j];
+		for (unsigned int i = 0; i < currentTurnRessources.size(); i++){
+			for (unsigned int j = 0; j < currentTurnRessources[i].size(); j++){
+				sumGatheredRessources += currentTurnRessources[i][j] * variancesRessources[i][currentTurn];
+				sumChiefsRessources += currentTurnChiefRessources[i][j] * variancesRessources[i][currentTurn];
 			}
 		}
 
-		for (int i = 0; i < MAX_RESSOURCES; i++){
-			variancesRessources[i][currentTurn] += 1.5 - 
+		for (unsigned int i = 0; i < MAX_RESSOURCES; i++){
+			int sum = 0;
+			for (unsigned int j = 0; j < variancesRessources[i].size(); j++){
+				sum += variancesRessources[i][j];
+			}
+			variancesRessources[i][currentTurn] += 1.5 - (sumGatheredRessources/total + sum / sumGatheredRessources );
 		}
 	}
 

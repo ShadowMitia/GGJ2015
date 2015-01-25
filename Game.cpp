@@ -138,6 +138,7 @@ void Game::render() {
 		} 
 		p.draw(m_window); 
 	}
+	stats.drawCurrentTurnRessources(m_window, ressourceManager);
 	//m_window.draw(m_statistics_text);
 	m_window.display();
 }

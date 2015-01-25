@@ -13,6 +13,7 @@
 #include "Collision.hpp"
 #include "Powerup.hpp"
 #include "RessourceManager.hpp"
+#include "Stats.hpp"
 
 // For random things
 #include <ctime>
@@ -58,6 +59,8 @@ class Game : private sf::NonCopyable {
 		std::vector<Powerup> powerups;
 
 		RessourceManager ressourceManager;
+
+		Stats stats;
 
 		int currentChief{-1};
 
