@@ -41,6 +41,21 @@ public:
 		std::cout << "Client connected: " << server.getRemoteAddress() << std::endl;
 	}
 
+	void send(sf::Packet packet){
+		status = server.send(packet);
+	}
+
+	void receive(sf::Packet packet, int info){
+		if (info == 0){
+			for (int i = 0; i < NUMBER_PLAYER; i++){
+				for (int j = 0; j < MAX_RESSOURCES; j++){
+					packet >> currentTurnRessources[i][j];
+				}
+			}
+		}
+
+	}
+
 
 private:
 

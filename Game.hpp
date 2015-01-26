@@ -60,11 +60,17 @@ class Game : private sf::NonCopyable {
 		int currentChief{-1};
 		int currentTurn{0};
 
+		sf::Clock turnTimer;
+
 
 		// Network stuff
 
 		Network* network;
-		bool server;
+		bool server{false};
+
+		bool inTurn{true};
+
+		sf::Packet currentTurnRessourcesPacket;
 
 
 

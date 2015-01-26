@@ -1,0 +1,68 @@
+4 ressources [OK]
+4 joueurs (1 chef, 3 recoltes)
+
+tour par tour:
+	ETAPE 1
+	les joueurs se deplacent librement dans le plan, mais leur vitesse est lié a un bouton sur lequel il faut masher
+
+	terrain + grand que ecran : effet de dezoomage quand joueurs s'eloignent les uns de autres
+
+	les joueurs recoltent les ressources pendant un temps limité 
+
+	fraction des ressources affiches des le debut, le reste arrive a intervalles reguliers
+
+	deux bonus apparaissent de facons aleatoires:
+		- boost vitesse [OK] (mettre une trainée derriere le joueur)
+		- effet special vitesse constante (pas besoin de masher bouton pendant x temps) ??
+		- boost qui ralentit les autres [OK]
+		- special camera qui zoom + centrer sur le joueur qui a le bonus
+
+	chaque joueur va avoir des objectifs individuels:
+		- faire passer une ressource (differente?) au dessus d'un certain seuil
+
+	nombre fixé de ressources totales pour le tour (dépend des tours précédents)
+		nombre de ressources a affiché de ressource en fluctuation
+		plus la valeur d'une ressource est grande moins elle apparait
+		frequence d'apparition N_VALEUR = 2/(1 + valeur relative de la ressource) * densite * indice efficacite chef tour precedent
+
+	chef attribue les ressources aux differents joueurs
+		possibilité de détournés les ressource vers lui (voler des ressources)
+
+	ETAPE 2
+	on expose les resultats
+
+		# = a verifier
+		# tableaux individuels nombres de ressources relatives (somme de chaque ressource vaut 1, normé) par ressources par joueur du tour en cours [OK]
+		# valeurs relatives recoltés pour le tour pour chaque joueur (efficacite du joueur ce tour) [OK]
+
+		(on affiche pas le manager bien sur)
+
+		indice d'efficacite du chef (depend des ressources)
+
+	chef recupere 1/4 des ressources recoltes * indice
+
+	3 / 4 restant redistribué entre les recolteurs en fontion de leurs valeurs relatives
+
+	ETAPE 3
+	decision du nouveau chef
+	vote:
+		si on maintient pas c'est celui qui a la plus forte valeur qui prend sa place (autre que le chef)
+
+	ETAPE 4
+	chef voit l'evolution des indicatifs de valeurs des ressources et donne les instructions de recoltes
+	chef lance la nouvelle recolte
+
+	ETAPE 5 (caché)
+		calcul des nouvelles valeurs des ressources par rapport aux recoltes du tour d'avant
+
+
+objectif global:
+	score lié au nombre de ressource et a leur valeur
+	jeu se termine quand score atteint un certain seuil
+
+classement final
+	chaque jouer = somme ressources * valeurs
+	meilleur score individuel gagne
+
+
+SON

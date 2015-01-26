@@ -53,6 +53,10 @@ public:
 		currentTurnRessources[player.getNumber()][type]++;
 	}
 
+	void chiefCounterPlayerRessource(int player, int type){
+		currentTurnChiefRessources[player][type]++;
+	}
+
 	void addCurrentTurnToGlobal(){
 		for (unsigned int i = 0; i < currentTurnRessources.size(); i++){
 			for (unsigned int j = 0; j < currentTurnRessources[i].size(); j++){

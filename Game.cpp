@@ -9,13 +9,15 @@ Game::Game(std::string name, bool isServer)
 , players()
 , powerups()
 , ressourceManager()
-, server(server)
+, server(isServer)
 {
+	
 	if (server){
 		network = new Network(53000);
 	} else {
 		network = new Network(sf::IpAddress::LocalHost, 53000);
 	}
+	
 
 	m_font.loadFromFile("media/Prototype.ttf");
 	m_numberFont.loadFromFile("media/Prototype.ttf");
@@ -43,6 +45,7 @@ Game::Game(std::string name, bool isServer)
 void Game::run() {
 	sf::Clock clock;
 	sf::Time timeSinceLastUpdate = sf::Time::Zero;
+	turnTimer.restart();
 	while (m_window.isOpen()) {
 		sf::Time elapsedTime = clock.restart();
 		timeSinceLastUpdate += elapsedTime;
@@ -73,13 +76,68 @@ void Game::processEvents() {
 					if (event.key.code == sf::Keyboard::Escape){
 						m_window.close();
 					}
+					switch (event.key.code){
+						// Player 1
+						case sf::Keyboard::Q:
+							ressourceManager.chiefCounterPlayerRessource(0, 0);
+						break;
+
+						case sf::Keyboard::W:
+							ressourceManager.chiefCounterPlayerRessource(0, 1);
+						break;
+
+						case sf::Keyboard::E:
+							ressourceManager.chiefCounterPlayerRessource(0, 2);
+						break;
+
+						case sf::Keyboard::R:
+							ressourceManager.chiefCounterPlayerRessource(0, 3);
+						break;
+
+						// Player 2
+						case sf::Keyboard::A:
+							ressourceManager.chiefCounterPlayerRessource(1, 0);
+							break;
+
+						case sf::Keyboard::S:
+							ressourceManager.chiefCounterPlayerRessource(1, 1);
+							break;
+
+						case sf::Keyboard::D:
+							ressourceManager.chiefCounterPlayerRessource(1, 2);
+							break;
+
+						case sf::Keyboard::F:
+							ressourceManager.chiefCounterPlayerRessource(1, 3);
+							break;
+
+						// Player 3
+						case sf::Keyboard::Y:
+							ressourceManager.chiefCounterPlayerRessource(2, 0);
+						break;
+
+						case sf::Keyboard::X:
+							ressourceManager.chiefCounterPlayerRessource(2, 1);
+						break;
+
+						case sf::Keyboard::C:
+							ressourceManager.chiefCounterPlayerRessource(2, 2);
+						break;
+
+						case sf::Keyboard::V:
+							ressourceManager.chiefCounterPlayerRessource(2, 3);
+						break;
+
+						default:
+							break;
+					}
 					break;
 
 				default:
 					break;
 			}
 
-		// SERVER SPECIFIC EVENTS
+		// END SERVER SPECIFIC EVENTS
 		}
 	} else {
 		// CLIENT SPECIFIC EVENTS
@@ -116,89 +174,115 @@ void Game::update(sf::Time elapsedTime) {
 	if (server){
 		// SERVER UPDATE
 		
+		ressourceManager.printDebug();
+		
 		// END SERVER UPDATE
 
 	} else {
 		// CLIENT UPDATE
-		for (Player& p : players){
-			if ( p.getNumber() == currentChief){
-				break;
-			}
-			p.update(elapsedTime);	
-		}
-
-		for (Player& p : players){
-			if ( p.getNumber() == currentChief){
-				break;
-			}
-			for (auto& e : pickableRessources){
-				if (Collisions::collisionPlayer(p, e)){
-					ressourceManager.playerGrabRessource(p, e.getType());
-					e.destroy();
+		
+		if (inTurn){
+			for (Player& p : players){
+				if ( p.getNumber() == currentChief){
+					break;
 				}
+				p.update(elapsedTime);	
 			}
 
-			for(Powerup& pu : powerups){
-				if (Collisions::collisionPlayer(p, pu)){
-					if (pu.getEffect() == Effect::SPEED){
-						p.applySpeedEffect();
-						pu.destroy();
-					} else if (pu.getEffect() == Effect::SLOW_DOWN){
-						for (Player& player : players){
-							if (player.getNumber() != p.getNumber()){
-								player.applySlowDownEffect();
-							}
-						}
-						pu.destroy();
+			for (Player& p : players){
+				if ( p.getNumber() == currentChief){
+					break;
+				}
+				for (auto& e : pickableRessources){
+					if (Collisions::collisionPlayer(p, e)){
+						ressourceManager.playerGrabRessource(p, e.getType());
+						e.destroy();
 					}
 				}
+
+				for(Powerup& pu : powerups){
+					if (Collisions::collisionPlayer(p, pu)){
+						if (pu.getEffect() == Effect::SPEED){
+							p.applySpeedEffect();
+							pu.destroy();
+						} else if (pu.getEffect() == Effect::SLOW_DOWN){
+							for (Player& player : players){
+								if (player.getNumber() != p.getNumber()){
+									player.applySlowDownEffect();
+								}
+							}
+							pu.destroy();
+						}
+					}
+				}
+
+				if (turnTimer.getElapsedTime() > sf::seconds(30)){
+					inTurn = false;
+					for (int i = 0; i < ressourceManager.getCurrentTurnRessources().size(); i++){
+						for (int j = 0; j < ressourceManager.getCurrentTurnRessources()[i].size(); i++){
+							currentTurnRessourcesPacket << ressourceManager.getCurrentTurnRessources()[i][j];
+						}
+					}
+					network->send(currentTurnRessourcesPacket);
+				}
 			}
+
+			// next bit should be refactorized
+
+			// remove all picked up ressources
+		    pickableRessources.erase(std::remove_if(std::begin(pickableRessources), std::end(pickableRessources), 
+		    [](Entity& entity){ return entity.destroyed(); }), 
+		    std::end(pickableRessources));
+
+		    // remove all picked up powerups
+		    powerups.erase(std::remove_if(std::begin(powerups), std::end(powerups),
+		    	[](Powerup& pu){ return pu.destroyed(); }),
+		    std::end(powerups));
+
+		    // end next bit
+		    
+
+		    // END CLIENT UPDATE
 		}
-
-		// next bit should be refactorized
-
-		// remove all picked up ressources
-	    pickableRessources.erase(std::remove_if(std::begin(pickableRessources), std::end(pickableRessources), 
-	    [](Entity& entity){ return entity.destroyed(); }), 
-	    std::end(pickableRessources));
-
-	    // remove all picked up powerups
-	    powerups.erase(std::remove_if(std::begin(powerups), std::end(powerups),
-	    	[](Powerup& pu){ return pu.destroyed(); }),
-	    std::end(powerups));
-
-	    // end next bit
-	    
-
-	    // END CLIENT UPDATE
 	}
 }
 
 void Game::render() {
 	if (server){
 		// SERVER RENDERING
+		m_window.clear();
+		sf::Text serverText("Server", m_font, 200);
+		serverText.setPosition(200, 200);
+		m_window.draw(serverText);
+		m_window.display();
 		
 		// END SERVER RENDERING
 	} else {
 		// CLIENT RENDERING
-		
 		m_window.clear();
-		//ressourceManager.printDebug();
-		for (Ressource& e : pickableRessources) { e.draw(m_window); }
-		for (Powerup& pu : powerups) { pu.draw(m_window); }
-		for (Player& p : players) {
-			if ( p.getNumber() == currentChief){
-				break;
-			}
-			p.draw(m_window); 
-		}
-		//Stats::drawCurrentTurnRessources(m_window, ressourceManager, currentChief);
-		Stats::drawCurrentTurnValuesRessources(m_window, ressourceManager, currentChief, currentTurn);
-		//m_window.draw(m_statistics_text);
-		m_window.display();
+		if (inTurn){
 
+			//ressourceManager.printDebug();
+			for (Ressource& e : pickableRessources) { e.draw(m_window); }
+			for (Powerup& pu : powerups) { pu.draw(m_window); }
+			for (Player& p : players) {
+				if ( p.getNumber() == currentChief){
+					break;
+				}
+				p.draw(m_window); 
+			}
+		} else {
+			Stats::drawCurrentTurnRessources(m_window, ressourceManager, currentChief);
+			Stats::drawCurrentTurnValuesRessources(m_window, ressourceManager, currentChief, currentTurn);
+		}
+
+
+		//m_window.draw(m_statistics_text);
+		
+		m_window.display();
 		// END CLIENT RENDERING
 	}
+
 }
 
 void Game::updateStatistics(sf::Time elapsedTime) {
